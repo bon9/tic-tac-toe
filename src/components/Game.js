@@ -16,7 +16,6 @@ const Game = props => {
   const [curNumber, setCurNumber] = useState(0);
   const [isActive, setIsActive] = useState(null);
   const [isSort, setIsSort] = useState(false);
-  // const [winSquares, setWinSquares] = useState(false);
 
   const handleClick = i => {
     // create a new sliced history
@@ -25,7 +24,7 @@ const Game = props => {
     const current = newHistory[newHistory.length - 1];
     // copy current object squares in newSquares
     const newSquares = current.squares.slice();
-    // check
+    // если есть победитель или клик по той же клетке
     if (calculateWinner(newSquares) || newSquares[i]) {
       return;
     }
@@ -62,9 +61,9 @@ const Game = props => {
     const desc = move
       ? `Перейти к ходу # ${move}, позиция: ${pos[0]} ${pos[1]}`
       : `К началу игры`;
-    let attachedClass = "btnMoves";
+    let attachedClass = "btn-info";
     if (isActive === move) {
-      attachedClass = "btnMoves active";
+      attachedClass = "btn-info active";
     }
     return (
       <li key={move}>
@@ -81,32 +80,29 @@ const Game = props => {
     setIsSort(!isSort);
   };
 
-  const current = history[curNumber];
-  const winner = calculateWinner(current.squares);
+  const winner = calculateWinner(history[curNumber].squares);
 
   if (curNumber === 9 && winner === false) {
     alert("Ничья");
   }
 
-  let status;
-  if (winner) {
-    status = "Winner: " + winner.win;
-  } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
-  }
+  let status = winner
+    ? "Winner: " + winner.win
+    : "Next player: " + (xIsNext ? "X" : "O");
+  let winnerSquares = winner ? winner.winSquare : false;
 
   return (
     <div className="game">
-      <Board
-        squares={current.squares}
-        onClick={i => handleClick(i)}
-        status={status}
-      />
-      <Info
-        clicked={handleSwitch}
-        status={status}
-        moves={isSort ? sortedMoves : moves}
-      />
+      <div className="status">{status}</div>
+      <div className="wrap-game">
+        <Board
+          //передаем текущее состояние квадратов
+          squares={history[curNumber].squares}
+          onClick={i => handleClick(i)}
+          winnerSquares={winnerSquares}
+        />
+        <Info clicked={handleSwitch} moves={isSort ? sortedMoves : moves} />
+      </div>
     </div>
   );
 };
